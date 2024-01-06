@@ -5,3 +5,11 @@ spring:
     name: dan-service-tech-starter
   kafka:
     bootstrap-servers: localhost:9092
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          openfeign: DEBUG
+        retry: DEBUG

@@ -9,6 +9,17 @@ dan:
 
 spring:
   cloud:
+    loadbalancer:
+      retry:
+        maxRetriesOnNextServiceInstance: 3
+    openfeign:
+      circuitbreaker:
+        enabled: true
+      client:
+        config:
+          default:
+            read-timeout: 5000
+            connect-timeout: 1000
     kubernetes:
       loadbalancer:
         mode: SERVICE
@@ -51,3 +62,25 @@ management:
     distribution:
       percentiles-histogram:
         http.server.requests: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: ${spring.cloud.openfeign.client.config.default.read-timeout}
+  retry:
+    configs:
+      default:
+        max-attempts: ${spring.cloud.loadbalancer.retry.maxRetriesOnNextServiceInstance}
+        waitDuration: 1ms
+        retryExceptions:
+          - java.net.ConnectException
+          - java.net.UnknownHostException
+          - java.net.SocketTimeoutException
+          - org.apache.http.NoHttpResponseException
+          - org.apache.http.conn.ConnectTimeoutException
